@@ -1,0 +1,28 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.AmrMohamed17/oss-issues-mcp",
+  "description": "MCP server with derived GitHub issue tools: normalized fetch, new-issue watch, claim status.",  "repository": {
+    "url": "https://github.com/AmrMohamed17/oss-issues-mcp",
+    "source": "github"
+  },
+  "version": "0.1.1",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "oss-issues-mcp",
+      "version": "0.1.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "Fine-grained GitHub personal access token, read-only (public repos: Issues, Metadata, Contents).",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true,
+          "name": "GITHUB_TOKEN"
+        }
+      ]
+    }
+  ]
+}

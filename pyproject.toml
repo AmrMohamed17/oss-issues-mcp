@@ -1,6 +1,6 @@
 [project]
 name = "oss-issues-mcp"
-version = "0.1.0"
+version = "0.1.1"
 description = "An MCP server exposing derived, triage-oriented GitHub issue tools"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -29,3 +29,5 @@ dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 asyncio_mode = "auto"
+
+

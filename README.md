@@ -1,5 +1,5 @@
 # oss-issues-mcp
-
+<!-- mcp-name: io.github.AmrMohamed17/oss-issues-mcp -->
 An MCP server exposing **derived, triage-oriented** GitHub issue tools — not a
 passthrough of the GitHub API.
 
