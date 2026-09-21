@@ -90,3 +90,29 @@ async def get_file(client: httpx.AsyncClient, repo: str, path: str) -> str | Non
         return None
     _check(r, f"file {path} in {repo}")
     return r.text
+
+
+def _write_headers() -> dict:
+    """Headers for WRITE calls — uses a SEPARATE token from reads.
+    Commenting on public repos you don't own needs a classic public_repo-scoped
+    PAT, which is necessarily broad; safety comes from the allowlist + human gate,
+    not the token scope."""
+    token = os.getenv("GITHUB_WRITE_TOKEN")
+    if not token:
+        raise GitHubError("GITHUB_WRITE_TOKEN not set — writes are disabled.")
+    return {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+ 
+ 
+async def post_comment(client, repo: str, number: int, body: str) -> str:
+    """Post a comment to an issue. Returns the new comment's URL, or raises."""
+    r = await client.post(
+        f"{API}/repos/{repo}/issues/{number}/comments",
+        headers=_write_headers(), json={"body": body}, timeout=30,
+    )
+    if r.status_code != 201:
+        raise GitHubError(f"post failed ({r.status_code}): {r.text[:200]}")
+    return r.json().get("html_url", "")

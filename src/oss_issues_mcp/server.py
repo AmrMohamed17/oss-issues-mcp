@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
+import os
 import httpx
 from fastmcp import FastMCP
 
@@ -161,6 +162,35 @@ async def get_repo_context(repo: str) -> dict:
     }
     _repo_context_cache[repo] = result
     return result
+
+
+# ADD this tool to src/oss_issues_mcp/server.py.
+# Ensure `import os` is present at the top of server.py.
+# The read tools stay exactly as they are; this is the FIRST and ONLY write tool.
+
+@mcp.tool
+async def post_issue_comment(repo: str, number: int, body: str) -> dict:
+    """Post a comment to a GitHub issue. GATED WRITE — the only tool that writes.
+
+    Safe by default: requires a separate GITHUB_WRITE_TOKEN; without it, this
+    refuses. Repo allowlist enforced. Intended to be called only after a human
+    has approved the exact comment body.
+
+    Args:
+        repo: "owner/name" on the allowlist.
+        number: the issue number.
+        body: the exact comment text to post.
+    """
+    if repo not in ALLOWED_REPOS:
+        return _deny(repo)
+    if not body or not body.strip():
+        return {"error": "refused: empty comment body."}
+    try:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
+            url = await gh.post_comment(client, repo, number, body)
+        return {"posted": True, "url": url}
+    except gh.GitHubError as e:
+        return {"error": str(e)}
 
 
 def main() -> None:
