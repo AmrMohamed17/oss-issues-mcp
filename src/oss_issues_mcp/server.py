@@ -121,9 +121,14 @@ async def get_claim_status(repo: str, number: int) -> dict:
         return _deny(repo)
     try:
         async with httpx.AsyncClient(follow_redirects=True) as client:
-            issue = await gh.get_issue(client, repo, number)   # also guards PRs
+            issue = await gh.get_issue(client, repo, number)      # guards PRs
             timeline = await gh.get_timeline(client, repo, number)
+            search_prs = await gh.search_linked_prs(client, repo, number)
         result = assess_claim(issue, timeline)
+        # merge in PRs found via search (closing-keyword links)
+        merged = sorted(set(result["signals"]["linked_prs"]) | set(search_prs))
+        result["signals"]["linked_prs"] = merged
+        result["claimed"] = bool(result["signals"]["assignees"]) or bool(merged)
         result["repo"] = repo
         result["number"] = number
         return result

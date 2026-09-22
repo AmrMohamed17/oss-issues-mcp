@@ -62,6 +62,25 @@ async def list_repo_issues(
     _check(r, f"issues for {repo}")
     return r.json()
 
+async def search_linked_prs(client, repo: str, number: int) -> list[int]:
+    """PRs that reference this issue in their body (e.g. 'closes #N').
+    The issue timeline misses closing-keyword links; Search finds them."""
+    q = f"repo:{repo} is:pr {number} in:body"
+    r = await client.get(
+        f"{API}/search/issues",
+        params={"q": q, "per_page": 10},
+        headers=_headers(), timeout=30,
+    )
+    if r.status_code != 200:
+        return []                      # search failing shouldn't break claim check
+    out = []
+    for it in r.json().get("items", []):
+        n = it.get("number")
+        # exclude the issue itself; keep actual PRs that mention this number
+        if n and n != number and "/pull/" in it.get("html_url", ""):
+            out.append(n)
+    return out
+
 
 async def get_timeline(
     client: httpx.AsyncClient, repo: str, number: int
