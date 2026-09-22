@@ -21,11 +21,16 @@ mcp = FastMCP("oss-issues-mcp")
 # Least privilege: the server only ever touches these repositories. An LLM
 # cannot talk it into fetching an arbitrary repo.
 ALLOWED_REPOS = {
-    "langfuse/langfuse",
-    "mlflow/mlflow",
-    "run-llama/llama_index",
-    "vibrantlabsai/ragas",
-    "confident-ai/deepeval",
+"chroma-core/chroma",       
+"unslothai/unsloth",
+"traceloop/openllmetry",
+"mlflow/mlflow",
+"BerriAI/litellm",
+"pydantic/pydantic-ai",
+"Arize-ai/phoenix",
+"langfuse/langfuse",
+"run-llama/llama_index",
+"confident-ai/deepeval"
 }
 
 # get_repo_context reads files that essentially never change per-issue.
